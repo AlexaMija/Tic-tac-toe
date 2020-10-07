@@ -15,15 +15,16 @@ const cells = document.querySelectorAll(".cell");
 startGame();
 function startGame() {
   document.querySelector(".endgame").style.display = "none";
-origBoard = Array.from(Array(9).keys());
-for (var i = 0; i < cells.length; i++) {
+origBoard = Array.from(Array(9).keys()); /*ewerithing from 0-9*/
+for (var i = 0; i < cells.length; i++) /*Board clean after all cell are on*/{
   cells[i].innerText = " ";
   cells[i].style.removeProperty("background-color");
   cells[i].addEventListener("click", turnClick, false);
 }
 }
-function turnClick(square) {
-  if (typeof origBoard[square.target.id] == "number") {
+function turnClick(square) /* showing the id of the squere you clicking*/ {
+  if (typeof origBoard[square.target.id] == "number") /*you cant click on a place that's allredy been clicked*/
+   {
       turn(square.target.id, huPlayer)
       if (!checkWin(origBoard) && !checkTie()) turn( bestSpot(), aiPlayer);
   }
@@ -36,16 +37,20 @@ function turn(squareId, player) {
 }
 function checkWin(board, player) {
   let plays = board.reduce((a, e, i) =>
-(e === player) ? a.concat(i) : a, []);
-let gameWon = null;
+(e === player) ? a.concat(i) : a, []); /*find all the places on the board they have already been played in*/
+let gameWon = null; /*how to check if the game has been won*/
+/* ewery array from winCombos could create a win*/
 for (let [index, win] of winCombos.entries()) {
-  if (win.every(elem => plays.indexOf(elem) > -1)) {
+  if (win.every(elem => plays.indexOf(elem) > -1)) /* has the player played in every spots that counts as a win*/ {
     gameWon = {index: index, player: player};
     break;
   }
 }
 return gameWon;
 }
+/*if gameWon than run gameOver()
+if gameWon has null this will be false
+if gameWon = {index: index, player: player} = true and run gameOver() */
 function gameOver(gameWon) {
   for (let index of winCombos[gameWon.index]) {
     document.getElementById(index).style.backgroundColor =
@@ -58,34 +63,34 @@ function gameOver(gameWon) {
 }
 function declareWinner(who) {
   document.querySelector(".endgame").style.display = "block";
-  document.querySelector(".endgame .text").innerText = who;
+  document.querySelector(".endgame .text").innerText = who; /*37.41: Becouse of tictactoe.html*/
 }
 function emptySquares() {
-  return origBoard.filter(s => typeof s == "number");
+  return origBoard.filter(s => typeof s == "number"); /*Empty or not empty cell*/
 }
 function bestSpot() {
   return minimax(origBoard, aiPlayer).index;
 }
 function checkTie() {
-  if (emptySquares().length == 0) {
+  if (emptySquares().length == 0) /* Every squeres filled up and nobady's won yet*/{
     for (var i = 0; i < cells.length; i ++) {
     cells[i].style.backgroundColor = "green";
-    cells[i].removeEventListener("click", turnClick, false);
+    cells[i].removeEventListener("click", turnClick, false);/*remove the addEventListener so the user cant click anywhere*/
   }
   declareWinner("Tie Game!")
-  return true;
+  return true; /* On for Tie game */
 }
 return false;
 }
 
 function minimax(newBoard, player) {
-  var availSpots = emptySquares();
-  if (checkWin(newBoard, huPlayer)) {
-    return {score : -10};
+  var availSpots = emptySquares(newBoard);
+  if (checkWin(newBoard, player)) {
+    return {score: -10};
   }else if (checkWin(newBoard, aiPlayer)) {
-    return {score : 10};
+    return {score: 10};
   }else if (availSpots.length === 0) {
-    return {score : 0}
+    return {score: 0}
   }
   var moves = [];
   for (var i = 0; i < availSpots.length; i++) {
